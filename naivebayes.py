@@ -15,7 +15,11 @@ sample_docs = [
 
 # negative: 0, positive: 1
 sample_labels = [0, 0, 0, 1, 1]
-test_doc = ['predictable', 'with', 'no', 'fun']    
+test_doc = [
+    ['predictable', 'with', 'no', 'fun'],
+    ['powerful', 'messages', 'and', 'exciting', 'film'],
+    ['the', 'best', 'movie', 'currently']]
+
 
 def NaiveBayesTrain(training_docs_list: List[List[str]], 
                     training_labels: List[int]) -> List:
@@ -43,14 +47,14 @@ def NaiveBayesTrain(training_docs_list: List[List[str]],
     
     # initialization
     n_doc = len(training_docs_list)
-    n_class = Counter(training_labels)
-    p_class = [math.log(n_class[k]/n_doc) for k in n_class.keys()] # prior p
+    n_class = Counter(training_labels).values()
+    p_class = [math.log(c/n_doc) for c in n_class] # prior p
     
-    # concatenate all documents to find the vocabulary (unique terms)
-    entire_doc = []
-    for document in training_docs_list:
-        entire_doc.extend(document)
-    vocabulary = set(Counter(entire_doc))
+    # vocabulary (unique terms)
+    vocab = Counter()
+    for doc in training_docs_list:
+        vocab.update(doc)
+    vocabulary = list(vocab)
     V = len(vocabulary)
     
     # group documents according to class
@@ -60,6 +64,7 @@ def NaiveBayesTrain(training_docs_list: List[List[str]],
     
     # count occurrences of each word in each class
     word_counts = [Counter(d) for d in class_docs]
+    
     # count(w', c) + |V|
     denominator = [sum(counter.values()) + V for counter in word_counts]
     
@@ -74,14 +79,14 @@ def NaiveBayesTrain(training_docs_list: List[List[str]],
             likelihood[k][i] = math.log(likelihood[k][i] / denominator[i])
     return p_class, likelihood, vocabulary
     
-def NaiveBayesTest(test_document: List[str], 
+def NaiveBayesTest(test_documents: List[List[str]], 
                    prior: List[float], 
                    likelihood: Dict[str, List[float]], 
-                   vocabulary: List[str]) -> int:
+                   vocabulary: List[str]) -> List[int]:
     '''
     Parameters
     ----------
-    test_document : List[str]
+    test_document : List[List[str]]
         list of tokens for ONE test document
     prior : List[float]
         prior probability of each class
@@ -92,24 +97,28 @@ def NaiveBayesTest(test_document: List[str],
 
     Returns
     -------
-    int
-        the most probable class the test document belongs to
+    List[int]
+        the most probable class each test document belongs to
     '''
-    
-    sums = {i: prior[i] for i in range(len(prior))}
-    for i in range(len(prior)):
-        for w in test_document:
-            if w in vocabulary:
-                sums[i] += likelihood[w][i]
-    # essentially an argmax that finds the class with highest probability
-    return sorted(sums.items(), key = lambda x: x[1], reverse = True)[0][0]
+    predicted_classes = []
+    for doc in test_documents:
+        sums = {i: prior[i] for i in range(len(prior))}
+        for i in range(len(prior)):
+            for w in doc:
+                if w in vocabulary:
+                    sums[i] += likelihood[w][i]
+        # argmax that returns class with highest probability
+        predicted_classes.append(sorted(sums.items(), 
+                                        key = lambda x: x[1], 
+                                        reverse = True)[0][0])
+    return predicted_classes
 
 def main():
     prior_probabilities, log_likelihood, vocabulary = \
         NaiveBayesTrain(sample_docs, sample_labels)
-    prediction = NaiveBayesTest(test_doc, prior_probabilities, 
+    predicted_classes = NaiveBayesTest(test_doc, prior_probabilities, 
         log_likelihood, vocabulary)
-    print(f'Predicted class for the test sentence is: {prediction}.')
+    print(predicted_classes)
     
 if __name__ == '__main__':
     main()
