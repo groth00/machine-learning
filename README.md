@@ -1,4 +1,4 @@
-# naive-bayes
+# short ml exercises
 
 August 3, 2021: Naive Bayes Algorithm
 
