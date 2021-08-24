@@ -1,3 +1,16 @@
-8/23/2021
-
+8/23/2021 
 taking a quick look at the NeurIPS papers from 1987-2019 by using matplotlib/seaborn to generate barplots
+
+8/23-8/24
+used SparkNLP (and normal PySpark) to perform LDA (unsupervised method to cluster documents of text)
+
+current needs: manually adjust stopwords, filter out 1-length tokens
+
+possible adjustment: 
+lemmatize edge cases (not too important, could add those forms to the stopwords)
+
+todo:
+consider looking at gensim for more inference,
+use n-gram model, 
+cluster documents into a topic (argmax),
+visualizations: distribution of documents into topics, distribution of topics per year, wordcloud
