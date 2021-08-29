@@ -14,3 +14,8 @@ consider looking at gensim for more inference,
 use n-gram model, 
 cluster documents into a topic (argmax),
 visualizations: distribution of documents into topics, distribution of topics per year, wordcloud
+
+8/28
+adjusted tokenizer to require tokens of at least length 2
+manually added some stopwords to the list such as: et, al, cid, arXiv
+used the model to assign each document to a topic
